@@ -54,20 +54,52 @@ int scanLineAsInt() {
 }
 
 
-winner *readWinners(){
+winner *readWinners(int nbGagnants){
 	
+	winner *resultat=(winner *)calloc(nbGagnants,sizeof(winner));
+	for(int i=0;i<nbGagnants;i++){
+		(resultat+i)->annee=scanLineAsInt();
+		(resultat+i)->name=scanLine();
+		(resultat+i)->raison=scanLine();
+	};
+	return resultat;
+}
+
+void printWinners(winner *resultat,int nbGagnants){
+	printf("%i\n", nbGagnants);
+	for(int i=0;i<nbGagnants;i++){
+		printf("%i\n", resultat[i].annee);
+		printf("%s\n", resultat[i].name);
+		printf("%s\n", resultat[i].raison);
+	}
+}
+
+void infosAnnees(int nbGagnants, int annee){
+	winner *resultat;
+	resultat = readWinners(nbGagnants);
+	int i=0;
+	int stop =0;
+	while (i<nbGagnants && stop != 1){
+		if(resultat[i].annee==annee){
+			printf("en %i le(s) gagnant(s) ont été %s\nnature des travaux : %s\n", resultat[i].annee, resultat[i].name,resultat[i].raison);
+			stop = 1;
+		}
+		i++;
+	}
+	free(resultat);
 }
 
 int main(void)
 {
 	int nbGagnants = scanLineAsInt();
-	printf("nbGagnants = %i\n",nbGagnants);
+	//printf("nbGagnants = %i\n",nbGagnants);
 
-	winner *resultat;
-	resultat = readWinners();
-	printWinners(resultat);
+	/* winner *resultat;
+	resultat = readWinners(nbGagnants);
+	printWinners(resultat, nbGagnants); */
+	infosAnnees(nbGagnants, 2008);
+	//free(resultat); 
 
-	free(resultat);
 	return EXIT_SUCCESS;
 
 }
