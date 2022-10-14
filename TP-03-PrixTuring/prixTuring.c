@@ -105,7 +105,7 @@ void sortByYears(winner *resultat,int nbGagnants){
 	}
 }
 
-void addNewWinner(winner *resultat, int nbGagnants){
+winner *addNewWinner(winner *resultat, int nbGagnants){
 	winner newWinner;
 	/* printf("annee ? : ");
 	scanf("%i", &(newWinner.annee)); */
@@ -114,6 +114,7 @@ void addNewWinner(winner *resultat, int nbGagnants){
 	newWinner.raison = "TP sur le prix turing";
 	resultat = (winner *)realloc(resultat,(nbGagnants+1)*sizeof(winner));
 	resultat[nbGagnants]=newWinner;
+	return resultat;
 }
 
 int main(void)
@@ -122,14 +123,14 @@ int main(void)
 	//printf("nbGagnants = %i\n",nbGagnants);
 
 	winner *resultat;
-	nbGagnants = 3;
+	nbGagnants = 50;
 	resultat = readWinners(nbGagnants);
-	addNewWinner(resultat,nbGagnants);
+	resultat = addNewWinner(resultat,nbGagnants);
 	nbGagnants++;
 	//sortByYears(resultat,nbGagnants);
 	printWinners(resultat, nbGagnants);
 	//infosAnnees(nbGagnants, 2008);
-	for(int i=0;i<nbGagnants;i++){
+	for(int i=0;i<nbGagnants-1;i++){
 		free((resultat+i)->name);
 		free((resultat+i)->raison);
 	}
