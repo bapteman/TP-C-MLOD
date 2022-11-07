@@ -32,6 +32,7 @@ int main(void){
     for (int i=0;i<sommet1; i++){
         printf("%i \n", tabResult[i]);
     }
+    free(tabResult);
        
 
 
