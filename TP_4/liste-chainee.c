@@ -52,7 +52,7 @@ void afficheListe_i(Liste l) {
 // version recursive
 void afficheListe_r(Liste l) {
     if(estVide(l)){
-        printf(" fin de la liste");
+        printf(" \n");
     }else{
         printf("%i",(*l).val);
         afficheListe_r((*l).suiv);
@@ -150,16 +150,33 @@ Liste cherche_r(Element v,Liste l) {
 // ne fait rien si aucun élément possède cette valeur
 // version itérative
 Liste retirePremier_i(Element v, Liste l) {
-	return TODO;
+	Liste c=l;
+    if (!estVide(c)){
+	    if(equalsElement((c->suiv)->val, v)){
+            if(!estVide(((c->suiv)->suiv)->suiv)){
+                c->suiv = ((c->suiv)->suiv)->suiv;
+            }
+        }
+    }
+    return c;
 }
 
 
 // version recursive
 Liste retirePremier_r(Element v, Liste l) {
-	return TODO;
+    Liste c=cherche_r(v,l);
+    if (!estVide(c)){
+	    detruireElement(c->val);
+    }
+    return l;
 }
 
 
 void afficheEnvers_r(Liste l) {
-	TODO;
+	Liste c=l;
+    if(!estVide(c->suiv)){
+        afficheEnvers_r(c->suiv);
+        afficheElement(c->val);
+    }else{afficheElement(c->val);}
+    
 }
