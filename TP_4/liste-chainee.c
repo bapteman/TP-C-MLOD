@@ -151,14 +151,33 @@ Liste cherche_r(Element v,Liste l) {
 // version itérative
 Liste retirePremier_i(Element v, Liste l) {
 	Liste c=l;
-    if (!estVide(c)){
-	    if(equalsElement((c->suiv)->val, v)){
-            if(!estVide(((c->suiv)->suiv)->suiv)){
-                c->suiv = ((c->suiv)->suiv)->suiv;
-            }
+    if(estVide(l)){
+        return l;
+    }
+    Liste p= l->suiv;
+    if (equalsElement(c->val, v)){
+        l->suiv = NULL;
+        detruire_r(l);
+        return p;
+    }
+    while(!estVide(p->suiv)){
+	    if(equalsElement(p->val, v)){
+                
+                c->suiv = p->suiv;
+                p->suiv = NULL;
+                detruire_r(p);
+                return l;
+        } else{
+            c=p;
+            p=p->suiv;  
         }
     }
-    return c;
+    if(equalsElement(p->val,v)){
+        c->suiv = NULL;
+        detruire_r(p);
+        return l;
+    }
+    return l;
 }
 
 
