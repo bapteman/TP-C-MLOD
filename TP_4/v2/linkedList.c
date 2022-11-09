@@ -96,14 +96,14 @@ void detruire_r(Liste l) {
 // version itérative
 Liste ajoutFin_i(Element v, Liste l) {
 	Liste c=l;
-    if(estVide(l)){
+    if(estVide(c)){
         return creer(v);
     }
-    while((*l).suiv!=NULL){
-            l=(l->suiv);
+    while((*c).suiv!=NULL){
+            c=(c->suiv);
     }
-    l->suiv=creer(v);
-    return c;
+    c->suiv=creer(v);
+    return l;
 }
 
 // version recursive

@@ -3,15 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct{
-	char* name;
-    char* artiste;
-    char* album;
-    char* genre;
-    int discNumber;
-    int trackNumber;
-    int annee;
-}Music;
+
 
 bool equalsElement(Element e1, Element e2){
     Music *m1 = (Music *)e1;
@@ -21,12 +13,12 @@ bool equalsElement(Element e1, Element e2){
 
 void afficheElement(Element v){
     Music* v1=(Music *)v;
-    printf("%s, ", v1->name);
-    printf("%s, ", v1->artiste);
-    printf("%s, ", v1->album);
-    printf("%s, ", v1->genre);
-    printf("%i, ", v1->discNumber);
-    printf("%i, ", v1->trackNumber);
+    printf("%s ,", v1->name);
+    printf("%s ,", v1->artiste);
+    printf("%s ,", v1->album);
+    printf("%s ,", v1->genre);
+    printf("%i ,", v1->discNumber);
+    printf("%i ,", v1->trackNumber);
     printf("%i\n", v1->annee);
 }
 
