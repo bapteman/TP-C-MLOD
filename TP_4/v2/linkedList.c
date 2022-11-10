@@ -99,7 +99,7 @@ Liste ajoutFin_i(Element v, Liste l) {
     if(estVide(c)){
         return creer(v);
     }
-    while((*c).suiv!=NULL){
+    while(c->suiv!=NULL){
             c=(c->suiv);
     }
     c->suiv=creer(v);

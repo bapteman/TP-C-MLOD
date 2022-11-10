@@ -1,15 +1,15 @@
 #pragma once
 
-#include <linkedList.h>
+#include "linkedList.h"
 
 typedef struct{
 	char* name;
     char* artiste;
     char* album;
     char* genre;
-    int discNumber;
-    int trackNumber;
-    int annee;
+    char* discNumber;
+    char* trackNumber;
+    char* annee;
 }Music;
 
-Music* créerMusique(char* name, char* artiste, char* album, char* genre, int discNumber, int trackNumber, int annee);
+Music* créerMusique(char* name, char* artiste, char* album, char* genre, char* discNumber, char* trackNumber, char* annee);
