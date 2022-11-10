@@ -88,8 +88,7 @@ void detruire_r(Liste l) {
         detruireElement((*courant).val);
         free(courant);
         detruire_r(suivant);
-    
-}
+    }
 }
 
 // retourne la liste dans laquelle l'élément v a été ajouté en fin
@@ -130,7 +129,7 @@ Liste cherche_i(Element v,Liste l) {
         }else{
             c = c->suiv;
         }
-    }
+    }return NULL;
 }
 
 // version récursive
@@ -139,7 +138,9 @@ Liste cherche_r(Element v,Liste l) {
         return l;
     }else if( !estVide(l->suiv) )
     {
-        cherche_r(v,l->suiv);
+        return cherche_r(v,l->suiv);
+    }else{
+        return NULL;
     }
 }
 

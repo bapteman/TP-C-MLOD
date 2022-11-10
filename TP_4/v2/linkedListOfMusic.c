@@ -28,15 +28,14 @@ void detruireElement(Element v){
     free(v1->album);
     free(v1->genre);
     free(v1->artiste);
+    free(v1->discNumber);
+    free(v1->trackNumber);
+    free(v1->annee);
     free(v1);
 }
 
 Music* créerMusique(char* name,char* artist,char* album,char* genre,char* Disc_number,char* Track_number, char* Year){
     Music* newM = malloc(sizeof(Music));
-    newM->name=(char *)calloc(strlen(name),sizeof(char));
-    newM->artiste=(char *)calloc(strlen(artist),sizeof(char));
-    newM->album=(char *)calloc(strlen(album),sizeof(char));
-    newM->genre=(char *)calloc(strlen(genre),sizeof(char));
     newM->name=strdup(name);
     newM->artiste=strdup(artist);
     newM->album=strdup(album);
