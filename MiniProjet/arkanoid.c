@@ -27,7 +27,8 @@
 //----------------------------------------------------------------------------------
 #define PLAYER_MAX_LIFE         5
 #define LINES_OF_BRICKS         5
-#define BRICKS_PER_LINE        2
+#define BRICKS_PER_LINE        20
+#define MAX_BALLS               5
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
@@ -43,11 +44,14 @@ typedef struct Ball {
     Vector2 speed;
     int radius;
     bool active;
+    bool additional;
 } Ball;
 
 typedef struct Brick {
     Vector2 position;
     bool active;
+    bool aUnBonus;
+    bool aUnMalus;
 } Brick;
 
 //------------------------------------------------------------------------------------
@@ -63,6 +67,7 @@ static Player player = { 0 };
 static Ball ball = { 0 };
 static Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = { 0 };
 static Vector2 brickSize = { 0 };
+static Ball additionalBalls[MAX_BALLS] = {0};
 
 //------------------------------------------------------------------------------------
 // Module Functions Declaration (local)
@@ -129,6 +134,14 @@ void InitGame(void)
     ball.radius = 7;
     ball.active = false;
 
+    //initialize additional balls
+    for(int i=0;i<MAX_BALLS;i++){
+        additionalBalls[i].position = (Vector2){ screenWidth/2, screenHeight*7/8 - 30 };
+        additionalBalls[i].speed = (Vector2){ 0, 0 };
+        additionalBalls[i].radius = 7;
+        additionalBalls[i].active = false;
+    }
+
     // Initialize bricks
     int initialDownPosition = 50;
 
@@ -138,6 +151,9 @@ void InitGame(void)
         {
             brick[i][j].position = (Vector2){ j*brickSize.x + brickSize.x/2, i*brickSize.y + initialDownPosition };
             brick[i][j].active = true;
+            if(i==0 && j%4==0){
+                brick[i][j].aUnBonus=true;
+            }
         }
     }
 }
@@ -178,6 +194,19 @@ void UpdateGame(void)
                 ball.position = (Vector2){ player.position.x, screenHeight*7/8 - 30 };
             }
 
+            // Additional balls movement logic
+            for(int i=0;i<MAX_BALLS;i++){
+                if (additionalBalls[i].active)
+                {
+                    additionalBalls[i].position.x += additionalBalls[i].speed.x;
+                    additionalBalls[i].position.y += additionalBalls[i].speed.y;
+                }
+                else
+                {
+                    additionalBalls[i].position = (Vector2){ player.position.x, screenHeight*7/8 - 30 };
+                }
+            }
+
             // Collision logic: ball vs walls
             if (((ball.position.x + ball.radius) >= screenWidth) || ((ball.position.x - ball.radius) <= 0)) ball.speed.x *= -1;
             if ((ball.position.y - ball.radius) <= 0) ball.speed.y *= -1;
@@ -189,6 +218,17 @@ void UpdateGame(void)
                 player.life--;
             }
 
+            //Collision logic: additional balls vs walls
+            for(int i=0;i<MAX_BALLS;i++){
+                if (((additionalBalls[i].position.x + additionalBalls[i].radius) >= screenWidth) || ((additionalBalls[i].position.x - additionalBalls[i].radius) <= 0)) additionalBalls[i].speed.x *= -1;
+                if ((additionalBalls[i].position.y - additionalBalls[i].radius) <= 0) ball.speed.y *= -1;
+                if ((additionalBalls[i].position.y + additionalBalls[i].radius) >= screenHeight)
+                {
+                    additionalBalls[i].speed = (Vector2){ 0, 0 };
+                    additionalBalls[i].active = false;
+                }
+            }
+
             // Collision logic: ball vs player
             if (CheckCollisionCircleRec(ball.position, ball.radius,
                 (Rectangle){ player.position.x - player.size.x/2, player.position.y - player.size.y/2, player.size.x, player.size.y}))
@@ -197,6 +237,19 @@ void UpdateGame(void)
                 {
                     ball.speed.y *= -1;
                     ball.speed.x = (ball.position.x - player.position.x)/(player.size.x/2)*5;
+                }
+            }
+
+            // Collision logic: additional balls vs player
+            for(int i=0;i<MAX_BALLS;i++){
+                if (CheckCollisionCircleRec(additionalBalls[i].position, additionalBalls[i].radius,
+                    (Rectangle){ player.position.x - player.size.x/2, player.position.y - player.size.y/2, player.size.x, player.size.y}))
+                {
+                    if (additionalBalls[i].speed.y > 0)
+                    {
+                        additionalBalls[i].speed.y *= -1;
+                        additionalBalls[i].speed.x = (additionalBalls[i].position.x - player.position.x)/(player.size.x/2)*5;
+                    }
                 }
             }
 
@@ -214,6 +267,9 @@ void UpdateGame(void)
                         {
                             brick[i][j].active = false;
                             ball.speed.y *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
                         }
                         // Hit above
                         else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y/2)) &&
@@ -222,6 +278,9 @@ void UpdateGame(void)
                         {
                             brick[i][j].active = false;
                             ball.speed.y *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
                         }
                         // Hit left
                         else if (((ball.position.x + ball.radius) >= (brick[i][j].position.x - brickSize.x/2)) &&
@@ -230,6 +289,9 @@ void UpdateGame(void)
                         {
                             brick[i][j].active = false;
                             ball.speed.x *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
                         }
                         // Hit right
                         else if (((ball.position.x - ball.radius) <= (brick[i][j].position.x + brickSize.x/2)) &&
@@ -238,9 +300,69 @@ void UpdateGame(void)
                         {
                             brick[i][j].active = false;
                             ball.speed.x *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
                         }
                     }
                 }
+            }
+
+            //Collision logic: additional balls vs bricks
+            for(int k=0;k<MAX_BALLS;k++){
+            for (int i = 0; i < LINES_OF_BRICKS; i++)
+            {
+                for (int j = 0; j < BRICKS_PER_LINE; j++)
+                {
+                    if (brick[i][j].active)
+                    {
+                        // Hit below
+                        if (((additionalBalls[k].position.y - additionalBalls[k].radius) <= (brick[i][j].position.y + brickSize.y/2)) &&
+                            ((additionalBalls[k].position.y - additionalBalls[k].radius) > (brick[i][j].position.y + brickSize.y/2 + additionalBalls[k].speed.y)) &&
+                            ((fabs(additionalBalls[k].position.x - brick[i][j].position.x)) < (brickSize.x/2 + additionalBalls[k].radius*2/3)) && (additionalBalls[k].speed.y < 0))
+                        {
+                            brick[i][j].active = false;
+                            additionalBalls[k].speed.y *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
+                        }
+                        // Hit above
+                        else if (((additionalBalls[k].position.y + additionalBalls[k].radius) >= (brick[i][j].position.y - brickSize.y/2)) &&
+                                ((additionalBalls[k].position.y + additionalBalls[k].radius) < (brick[i][j].position.y - brickSize.y/2 + additionalBalls[k].speed.y)) &&
+                                ((fabs(additionalBalls[k].position.x - brick[i][j].position.x)) < (brickSize.x/2 + additionalBalls[k].radius*2/3)) && (additionalBalls[k].speed.y > 0))
+                        {
+                            brick[i][j].active = false;
+                            additionalBalls[k].speed.y *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
+                        }
+                        // Hit left
+                        else if (((additionalBalls[k].position.x + additionalBalls[k].radius) >= (brick[i][j].position.x - brickSize.x/2)) &&
+                                ((additionalBalls[k].position.x + additionalBalls[k].radius) < (brick[i][j].position.x - brickSize.x/2 + additionalBalls[k].speed.x)) &&
+                                ((fabs(additionalBalls[k].position.y - brick[i][j].position.y)) < (brickSize.y/2 + additionalBalls[k].radius*2/3)) && (additionalBalls[k].speed.x > 0))
+                        {
+                            brick[i][j].active = false;
+                            additionalBalls[k].speed.x *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
+                        }
+                        // Hit right
+                        else if (((additionalBalls[k].position.x - additionalBalls[k].radius) <= (brick[i][j].position.x + brickSize.x/2)) &&
+                                ((additionalBalls[k].position.x - additionalBalls[k].radius) > (brick[i][j].position.x + brickSize.x/2 + additionalBalls[k].speed.x)) &&
+                                ((fabs(additionalBalls[k].position.y - brick[i][j].position.y)) < (brickSize.y/2 + additionalBalls[k].radius*2/3)) && (additionalBalls[k].speed.x < 0))
+                        {
+                            brick[i][j].active = false;
+                            additionalBalls[k].speed.x *= -1;
+                            if(brick[i][j].aUnBonus){
+                                addBall(player.position);
+                            }
+                        }
+                    }
+                }
+            }
             }
 
             // Game over logic
@@ -287,6 +409,12 @@ void DrawGame(void)
             // Draw ball
             DrawCircleV(ball.position, ball.radius, MAROON);
 
+            // Draw additional balls
+            for(int i=0;i<MAX_BALLS;i++){
+                if(additionalBalls[i].active){
+                    DrawCircleV(additionalBalls[i].position, additionalBalls[i].radius, BLUE);
+                }
+            }
             // Draw bricks
             for (int i = 0; i < LINES_OF_BRICKS; i++)
             {
@@ -294,7 +422,10 @@ void DrawGame(void)
                 {
                     if (brick[i][j].active)
                     {
-                        if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, GRAY);
+                        if(brick[i][j].aUnBonus){
+                            if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, RED);
+                        }
+                        else if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, GRAY);
                         else DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, DARKGRAY);
                     }
                 }
@@ -306,6 +437,18 @@ void DrawGame(void)
 
     EndDrawing();
 }
+
+void addBall(Vector2 position){
+    for(int i=0;i<MAX_BALLS;i++){
+        if(!additionalBalls[i].active){
+            additionalBalls[i].active=true;
+            additionalBalls[i].position=position;
+            additionalBalls[i].speed = (Vector2){ 0, -5 };
+        }
+        }
+}
+
+
 
 // Unload game variables
 void UnloadGame(void)
