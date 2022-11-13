@@ -51,7 +51,6 @@ typedef struct Brick {
     Vector2 position;
     bool active;
     bool aUnBonus;
-    bool aUnMalus;
 } Brick;
 
 //------------------------------------------------------------------------------------
@@ -216,12 +215,15 @@ void UpdateGame(void)
                 ball.active = false;
 
                 player.life--;
+                for(int i=0;i<MAX_BALLS;i++){
+                    additionalBalls[i].active=false;
+                }
             }
 
             //Collision logic: additional balls vs walls
             for(int i=0;i<MAX_BALLS;i++){
                 if (((additionalBalls[i].position.x + additionalBalls[i].radius) >= screenWidth) || ((additionalBalls[i].position.x - additionalBalls[i].radius) <= 0)) additionalBalls[i].speed.x *= -1;
-                if ((additionalBalls[i].position.y - additionalBalls[i].radius) <= 0) ball.speed.y *= -1;
+                if ((additionalBalls[i].position.y - additionalBalls[i].radius) <= 0) additionalBalls[i].speed.y *= -1;
                 if ((additionalBalls[i].position.y + additionalBalls[i].radius) >= screenHeight)
                 {
                     additionalBalls[i].speed = (Vector2){ 0, 0 };
@@ -242,6 +244,7 @@ void UpdateGame(void)
 
             // Collision logic: additional balls vs player
             for(int i=0;i<MAX_BALLS;i++){
+                if(additionalBalls[i].active){
                 if (CheckCollisionCircleRec(additionalBalls[i].position, additionalBalls[i].radius,
                     (Rectangle){ player.position.x - player.size.x/2, player.position.y - player.size.y/2, player.size.x, player.size.y}))
                 {
@@ -250,6 +253,7 @@ void UpdateGame(void)
                         additionalBalls[i].speed.y *= -1;
                         additionalBalls[i].speed.x = (additionalBalls[i].position.x - player.position.x)/(player.size.x/2)*5;
                     }
+                }
                 }
             }
 
@@ -364,6 +368,7 @@ void UpdateGame(void)
                 }
             }
             }
+            }
 
             // Game over logic
             if (player.life <= 0) gameOver = true;
@@ -380,7 +385,7 @@ void UpdateGame(void)
                 }
             }
         }
-    }
+    
     else
     {
         if (IsKeyPressed(KEY_ENTER))
@@ -439,13 +444,13 @@ void DrawGame(void)
 }
 
 void addBall(Vector2 position){
-    for(int i=0;i<MAX_BALLS;i++){
-        if(!additionalBalls[i].active){
-            additionalBalls[i].active=true;
-            additionalBalls[i].position=position;
-            additionalBalls[i].speed = (Vector2){ 0, -5 };
-        }
-        }
+    int i=0;
+    while(additionalBalls[i].active){
+        i++;
+    }
+    additionalBalls[i].active=true;
+    additionalBalls[i].position=position;
+    additionalBalls[i].speed = (Vector2){ 0, -5 };
 }
 
 
