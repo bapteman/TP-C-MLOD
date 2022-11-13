@@ -167,6 +167,17 @@ void InitGame(void)
     }
 }
 
+//Function to add a new ball with the bonus
+void addBall(Vector2 position){
+    int i=0;
+    while(additionalBalls[i].active){
+        i++;
+    }
+    additionalBalls[i].active=true;
+    additionalBalls[i].position=position;
+    additionalBalls[i].speed = (Vector2){ 0, -5 };
+}
+
 // Update game (one frame)
 void UpdateGame(void)
 {
@@ -479,10 +490,10 @@ void DrawGame(void)
                     if (brick[i][j].active)
                     {
                         if(brick[i][j].aUnBonus){
-                            if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, RED);
+                            if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, GREEN);
                         }
                         else if (brick[i][j].agrandis) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, BLUE);
-                        else if (brick[i][j].retrecis) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, ORANGE);
+                        else if (brick[i][j].retrecis) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, RED);
                         else if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, GRAY);
                         else DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, DARKGRAY);
                     }
@@ -496,15 +507,7 @@ void DrawGame(void)
     EndDrawing();
 }
 
-void addBall(Vector2 position){
-    int i=0;
-    while(additionalBalls[i].active){
-        i++;
-    }
-    additionalBalls[i].active=true;
-    additionalBalls[i].position=position;
-    additionalBalls[i].speed = (Vector2){ 0, -5 };
-}
+
 
 
 
