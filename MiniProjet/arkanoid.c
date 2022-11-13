@@ -28,7 +28,8 @@
 #define PLAYER_MAX_LIFE         5
 #define LINES_OF_BRICKS         5
 #define BRICKS_PER_LINE        20
-#define MAX_BALLS               5
+#define MAX_BALLS               5 //Defines the number of bonuses
+#define NB_BONUS_AGRANDIS       3
 
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
@@ -51,6 +52,8 @@ typedef struct Brick {
     Vector2 position;
     bool active;
     bool aUnBonus;
+    bool agrandis;
+    bool retrecis;
 } Brick;
 
 //------------------------------------------------------------------------------------
@@ -150,8 +153,15 @@ void InitGame(void)
         {
             brick[i][j].position = (Vector2){ j*brickSize.x + brickSize.x/2, i*brickSize.y + initialDownPosition };
             brick[i][j].active = true;
-            if(i==0 && j%4==0){
+            if(i==0 && j%(BRICKS_PER_LINE/MAX_BALLS)==0){
                 brick[i][j].aUnBonus=true;
+            }
+            int ecart_entre_bonus = BRICKS_PER_LINE/NB_BONUS_AGRANDIS;
+            if(i==1 && j%ecart_entre_bonus==0){
+                brick[i][j].agrandis=true;
+                if(j+ecart_entre_bonus/2<BRICKS_PER_LINE){
+                    brick[i][j+ecart_entre_bonus/2].retrecis=true;
+                }
             }
         }
     }
@@ -274,6 +284,12 @@ void UpdateGame(void)
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
                             }
+                            else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
+                            }
                         }
                         // Hit above
                         else if (((ball.position.y + ball.radius) >= (brick[i][j].position.y - brickSize.y/2)) &&
@@ -284,6 +300,11 @@ void UpdateGame(void)
                             ball.speed.y *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                         // Hit left
@@ -295,6 +316,11 @@ void UpdateGame(void)
                             ball.speed.x *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                         // Hit right
@@ -306,6 +332,11 @@ void UpdateGame(void)
                             ball.speed.x *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                     }
@@ -329,6 +360,11 @@ void UpdateGame(void)
                             additionalBalls[k].speed.y *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                         // Hit above
@@ -340,6 +376,11 @@ void UpdateGame(void)
                             additionalBalls[k].speed.y *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                         // Hit left
@@ -351,6 +392,11 @@ void UpdateGame(void)
                             additionalBalls[k].speed.x *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                         // Hit right
@@ -362,6 +408,11 @@ void UpdateGame(void)
                             additionalBalls[k].speed.x *= -1;
                             if(brick[i][j].aUnBonus){
                                 addBall(player.position);
+                            }else if(brick[i][j].agrandis){
+                                player.size=(Vector2){player.size.x+30,player.size.y};
+                            }
+                            else if(brick[i][j].retrecis){
+                                player.size=(Vector2){player.size.x-15,player.size.y};
                             }
                         }
                     }
@@ -430,6 +481,8 @@ void DrawGame(void)
                         if(brick[i][j].aUnBonus){
                             if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, RED);
                         }
+                        else if (brick[i][j].agrandis) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, BLUE);
+                        else if (brick[i][j].retrecis) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, ORANGE);
                         else if ((i + j) % 2 == 0) DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, GRAY);
                         else DrawRectangle(brick[i][j].position.x - brickSize.x/2, brick[i][j].position.y - brickSize.y/2, brickSize.x, brickSize.y, DARKGRAY);
                     }
