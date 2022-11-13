@@ -5,10 +5,14 @@
 gcc -o arkanoid arkanoid.c -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result -s -O1 -D_DEFAULT_SOURCE -I. -I/home/bot/Raylib.git/src -I/home/bot/Raylib.git/src/external -I/usr/local/include -L. -L/home/bot/Raylib.git/src -L/home/bot/Raylib.git/src -L/usr/local/lib -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -latomic -DPLATFORM_DESKTOP
 
 # Comment exécuter
+./arkanoid
+
 # Comment utiliser le projet
 screenshot(s) du jeu
 règles, touches, ...
 # URL vidéo de démo
 # Quelques détails sur votre implémentation
-quel(s) fichier(s), structures de données, algorithme, ...
+principalement de l'ajout de champ dans une structure, des booléens sur les briques pour les bonus. Plus un tableau de balles pour les balles à ajouter. Pour finir un ajout de variables globales avec un #define pour pouvoir facilement changer le nombre de bonus
+
 # Extensions / améliorations possibles
+utilisation de l'aléatoire pour génerer les briques avce les bonus, simplification du code en intégrant la balle principale dans un même tableau avec les balles additionelles
